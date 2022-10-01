@@ -4,7 +4,7 @@ import { FC } from 'react';
 import { Navbar, Sidebar } from '../iu';
 
 interface Props {
-    title?: String;
+    title?: string;
     children: React.ReactNode;
 }
 

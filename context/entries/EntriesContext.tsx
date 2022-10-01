@@ -3,7 +3,7 @@ import { Entry } from '../../interfaces/entry';
 
 interface Context {
     entries: Entry[];
-    addEntry: (description: String) => void;
+    addEntry: (description: string) => void;
     updateEntry: (entry: Entry) => void;
 };
 

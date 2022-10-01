@@ -1,7 +1,7 @@
-import {FC, useReducer} from 'react';
+import {FC, useReducer, useEffect} from 'react';
 import { Entry } from '../../interfaces';
 import {EntriesContext, entriesReducer} from './';
-import { v4 as uuidv4 } from 'uuid';
+import { entriesAPI } from '../../apis';
 
 export interface EntriesState {
     entries: Entry[];
@@ -14,20 +14,27 @@ const ENTRIES_INITIAL_STATE: EntriesState = {
 export const EntriesProvider: FC<{children: React.ReactNode}> = ({children}) => {
     const [state, dispatch] = useReducer(entriesReducer, ENTRIES_INITIAL_STATE);
 
-    const addEntry = (description: String) => {
-        const newEntry: Entry = {
-            _id: uuidv4(),
-            createdAt: Date.now(),
-            description: description,
-            status: 'pending',
+    const addEntry = async (description: string) => {
+        try {
+            const {data} = await entriesAPI.post<Entry>('/entries', {description})
+            dispatch({type: '[Entry] - Add-Entry', payload: data});
+        } catch(e) {
+            alert('Error al agregar la tarea.');
         }
-
-        dispatch({type: '[Entry] - Add-Entry', payload: newEntry});
     }
 
     const updateEntry = (entry: Entry) => {
         dispatch({type: '[Entry] - Entry-Updated', payload: entry});
     }
+
+    const refreshEntries = async() => {
+        const {data} = await entriesAPI.get<Entry[]>('/entries');
+        dispatch({type: '[Entry] - Get-Entries', payload: data})
+    }
+
+    useEffect(() => {
+        refreshEntries();
+    },[])
 
     return (
         <EntriesContext.Provider value={{...state, addEntry, updateEntry}}>

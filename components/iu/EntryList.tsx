@@ -10,7 +10,7 @@ interface Props {
     status: EntryStatus;
 }
 
-const isPending = (status: String, value: boolean) => {   
+const isPending = (status: string, value: boolean) => {   
     if(status === 'pending' && value === false) return '253px';
     if(status === 'pending' && value === true) return '326px';
     return '200px';

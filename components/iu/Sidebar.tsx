@@ -34,7 +34,7 @@ const getIcon = (number: number) => {
     return null;
 }
 
-const menuItems: String[] = ['Inbox', 'Starred', 'Send email', 'Drafts']
+const menuItems: string[] = ['Inbox', 'Starred', 'Send email', 'Drafts']
 
 export const Sidebar = () => {
     const {sidemenuOpen, closeSideMenu} = useContext(UIContext);
