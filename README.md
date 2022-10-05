@@ -11,3 +11,11 @@ MongoDB URL:
 ```
 mongodb://localhost:27017/entriesDB
 ```
+
+El url se utiliza en las variables de entorno y si se requiere en mongo compass.
+
+* Reconstruir módulos de node
+
+```
+npm install
+```

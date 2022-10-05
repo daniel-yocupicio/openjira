@@ -2,6 +2,7 @@ import {FC, useReducer, useEffect} from 'react';
 import { Entry } from '../../interfaces';
 import {EntriesContext, entriesReducer} from './';
 import { entriesAPI } from '../../apis';
+import { useSnackbar } from 'notistack';
 
 export interface EntriesState {
     entries: Entry[];
@@ -13,6 +14,7 @@ const ENTRIES_INITIAL_STATE: EntriesState = {
 
 export const EntriesProvider: FC<{children: React.ReactNode}> = ({children}) => {
     const [state, dispatch] = useReducer(entriesReducer, ENTRIES_INITIAL_STATE);
+    const { enqueueSnackbar } = useSnackbar();
 
     const addEntry = async (description: string) => {
         try {
@@ -23,8 +25,25 @@ export const EntriesProvider: FC<{children: React.ReactNode}> = ({children}) => 
         }
     }
 
-    const updateEntry = (entry: Entry) => {
-        dispatch({type: '[Entry] - Entry-Updated', payload: entry});
+    const updateEntry = async (entry: Entry, showSnackbar = false) => {
+        try {
+            const {data} = await entriesAPI.put<Entry>(`/entries/${entry._id}`, {description: entry.description, status: entry.status});
+            dispatch({type: '[Entry] - Entry-Updated', payload: data});
+            
+            if (showSnackbar) {
+                enqueueSnackbar('Tarea actualizada', {
+                    variant: 'success',
+                    autoHideDuration: 1500,
+                    anchorOrigin: {
+                        vertical: 'top',
+                        horizontal: 'right'
+                    }
+                });
+            }
+            
+        } catch(e) {
+            alert(e);
+        }
     }
 
     const refreshEntries = async() => {

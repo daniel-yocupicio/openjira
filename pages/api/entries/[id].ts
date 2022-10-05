@@ -7,9 +7,7 @@ type Data =
 | {message: string}
 | IEntry
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-    console.log(req.query);
-    
+export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {   
     const {id} = req.query;
 
     if(!mongoose.isValidObjectId(id)){
@@ -17,6 +15,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
     }
 
     if(req.method === 'PUT') return putUpdateEntry(req, res);
+    if(req.method === 'GET') return getEntryById(req, res);
 
     res.status(404).json({ message: 'Ruta no existente' });
 }
@@ -42,8 +41,19 @@ const putUpdateEntry = async (req: NextApiRequest, res: NextApiResponse<Data>) =
         const entryUpdated = await Entry.findByIdAndUpdate(id, {description, status}, {runValidators: true, new: true});
         await db.disconnected();
         return res.status(201).json(entryUpdated!);
-    } catch(e) {
+    } catch(e: any) {
         await db.disconnected();
-        return res.status(400).json({message: 'Bad request'});
+        return res.status(400).json({message: e.errors.status.message});
     }
 };
+
+const getEntryById = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+    const {id} = req.query;
+
+    await db.connect();
+    const entry = await Entry.findById(id);
+    await db.disconnected();
+
+    if(!entry) return res.status(200).json({message: 'No se encontro ese dato.'});
+    return res.status(200).json(entry);
+}
